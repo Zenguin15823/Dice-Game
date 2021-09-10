@@ -3,10 +3,15 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import java.awt.Color;
@@ -15,14 +20,20 @@ import java.awt.Canvas;
 
 public class game extends Canvas implements KeyListener
 {
-	private boolean check, H1, H2, H3, G, T, U, I;
-	private int S1, S2, Score, P1, P2, G1, G2;
-	private String Guess;
+	private boolean check, H1, H2, H3, G, T, U, I, bet, Start;
+	private int S1, S2, Score, P1, P2, G1, G2, Co;
+	private String Guess, PGuess;
+	private ArrayList<Integer> j;
+	private BufferedImage img = null;
+	private BufferedImage i = null;
 	
-		//this is the constructor
+		
 	public game()
 	{
+		
+	    Co = 0;
 		check = false;
+		bet = false;
 		H1 = false;
 		H2 = false;
 		H3 = false;
@@ -30,6 +41,7 @@ public class game extends Canvas implements KeyListener
 		T = false;
 		U = false;
 		I = false;
+		Start = false;
 		S1 = (int)(Math.random() * 6) + 1;
 		S2 = (int)(Math.random() * 6) + 1;
 		G1 = 0;
@@ -37,16 +49,26 @@ public class game extends Canvas implements KeyListener
 		P1 = 1;
 		P2 = 1;
 		Guess = "";
-		Score = 50;
+		PGuess = "";
+		Score = 20;
+		j = new ArrayList<>();
 		setBackground(Color.BLACK);
 		addKeyListener( this );
 		setFocusable( true );
+		try
+		{
+		    img = ImageIO.read( new File("hand.png" ));
+		    i = ImageIO.read( new File("dice.png" ));
+		}
+		catch ( IOException exc )
+		{
+		    //TODO: Handle exception.
+		}
 		
 	}
 
 	public void paint( Graphics wi )
 	{
-		
 		
 		
 		Rectangle rect2 = new Rectangle(175, 175, 150, 150);
@@ -55,114 +77,163 @@ public class game extends Canvas implements KeyListener
 		Graphics2D window = (Graphics2D) wi;
 		window.setFont(new Font("TimesRoman", Font.PLAIN, 20));
 		
-		
-		
-		drawSq(rect2, rect, window, P1, P2);
-		hint (window, S1, S2);
-		Score(window);
-		if(G) {
+
+		if(!Start) {
+			setBackground(Color.black);
+			window.setFont(new Font("TimesRoman", Font.PLAIN, 100));
+			window.setColor(Color.white);
+			window.drawString("Dice Game", 165, 220);
 			window.setFont(new Font("TimesRoman", Font.PLAIN, 50));
-			window.drawString("Make A Guess", 200, 550);
+			window.drawString("Press enter to Start", 200, 280);
 			window.setFont(new Font("TimesRoman", Font.PLAIN, 20));
-			G = false;
+			window.drawImage( img, 225, 300, 300, 250, null );
+			window.drawImage( i, 275, 325, 200, 150, null );
 		}
-		textBox(window, Guess);
-		if(check) {
-			
-			int r = 0;
-			int l = (int)(Math.random() * 20) + 2;
-			
-			while(l % 2 == 1) {
-				l = (int)(Math.random() * 20) + 2;
-			}
-			
-			while( r < l) { 
-			
-				window.setColor( Color.WHITE );
-				
-				if(r%2 == 0) {
-					drawSq(rect2, rect, window);
-					
-					try {
-						Thread.sleep(50);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}				
-				}
-				
-				else {
-					drawDi(rect2, rect, window);
-					
-					try {
-						Thread.sleep(50);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				
-				window.clearRect(0, 0, 800, 600);
-				r++;
-			}	
-			
-			
-			drawSq(rect2, rect, window,S1, S2);
-
-
-			H1 = false;
-			H2 = false;
-			H3 = false;
-			I = false;
-			T = false;
-			U = false;
-			
-			if(!Guess.equals("")) {
-				int g = Integer.parseInt(Guess);
-				if(g == (S1+S2)) {
-					window.setFont(new Font("TimesRoman", Font.PLAIN, 50));
-					window.drawString("Correct", 600, 500);
-					Score += 5;
-				}
-				int l1 =  (S1+S2)-1;
-				int l2 =  (S1+S2)+1;
-				if(g == l1 || g == l2) {
-					window.setFont(new Font("TimesRoman", Font.PLAIN, 20));
-					window.drawString("You were 1 off, but I will give it to you", 200, 500);
-					Score += 3;
-				}
-				l1 =  (S1+S2)-2;
-				l2 =  (S1+S2)+2;
-				if(g == l1 || g == l2) {
-					window.setFont(new Font("TimesRoman", Font.PLAIN, 20));
-					window.drawString("You were 2 off, but I will allow it", 200, 500);
-					Score += 1;
-				}
-				if(g > l2 || g < l1) {
-					window.setFont(new Font("TimesRoman", Font.PLAIN, 50));
-					window.drawString("Incorrect", 600, 500);
-				}
-				
-				 
-			}
-			
-			P1 = S1;
-			P2 = S2;
-			
-			S1 = (int)(Math.random() * 6) + 1;
-			S2 = (int)(Math.random() * 6) + 1;
-			Guess = "";
-			
-			Score(window);
+		
+		else {
+			setBackground(Color.black);
+		
+			drawSq(rect2, rect, window, P1, P2);
 			hint (window, S1, S2);
-			
-			check = false;
+			Score(window);
+			if(G) {
+				
+				window.setFont(new Font("TimesRoman", Font.PLAIN, 50));
+				window.drawString("Make A Guess", 200, 550);
+				window.setFont(new Font("TimesRoman", Font.PLAIN, 20));
+				G = false;
+			}
+			if(!check) {textBox(window, Guess);}
+			if(check) {
+				
+				textBox(window, PGuess);
+				if(G) {
+					
+					window.setFont(new Font("TimesRoman", Font.PLAIN, 50));
+					window.drawString("Make A Guess", 200, 550);
+					window.setFont(new Font("TimesRoman", Font.PLAIN, 20));
+					G = false;
+				}
+				else {
+					window.drawString("How Much Do You Bet?", 200, 450);
+				}
+				textBox(window, Guess, 400, 500);
+				
+				
+				if(!Guess.equals("")){ Co = Integer.parseInt(Guess);}
+				
+				
+				if(bet) {
+					int r = 0;
+					int l = (int)(Math.random() * 20) + 2;
+					
+					while(l % 2 == 1) {
+						l = (int)(Math.random() * 20) + 2;
+					}
+					
+					while( r < l) { 
+					
+						window.setColor( Color.WHITE );
+						
+						if(r%2 == 0) {
+							drawSq(rect2, rect, window);
+							
+							try {
+								Thread.sleep(50);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}				
+						}
+						
+						else {
+							drawDi(rect2, rect, window);
+							
+							try {
+								Thread.sleep(50);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+						
+						window.clearRect(0, 0, 800, 600);
+						r++;
+					}	
+					
+					
+					drawSq(rect2, rect, window,S1, S2);
+		
+		
+					H1 = false;
+					H2 = false;
+					H3 = false;
+					I = false;
+					T = false;
+					U = false;
+					
+					if(!Guess.equals("")) {
+						int g = Integer.parseInt(PGuess);
+						if(g == (S1+S2)) {
+							window.setFont(new Font("TimesRoman", Font.PLAIN, 50));
+							window.drawString("Correct", 600, 500);
+							if(S1 == S2) {
+								window.setFont(new Font("TimesRoman", Font.PLAIN, 50));
+								window.drawString("You got a double! Double Points", 10, 550);
+								window.setFont(new Font("TimesRoman", Font.PLAIN, 20));
+								Score += Co*2;
+							}
+							else {
+								Score += Co;
+							}
+						}
+						int l1 =  (S1+S2)-1;
+						int l2 =  (S1+S2)+1;
+						if(g == l1 || g == l2) {
+							window.setFont(new Font("TimesRoman", Font.PLAIN, 20));
+							window.drawString("You were 1 off, but I will give it to you", 200, 500);
+							Score += Co/2;
+						}
+						if( g != (S1+S2) && g != (S1+S2-1) && g !=(S1+S2+1) ) {
+							window.setFont(new Font("TimesRoman", Font.PLAIN, 50));
+							window.drawString("Incorect", 600, 500);
+							Score -= Co;
+						}
+						
+						 
+					}
+					
+					
+					
+					P1 = S1;
+					P2 = S2;
+					
+					S1 = (int)(Math.random() * 6) + 1;
+					S2 = (int)(Math.random() * 6) + 1;
+					Guess = "";
+					PGuess = "";
+					
+					j = new ArrayList<>();
+					
+					Score(window);
+					hint (window, S1, S2);
+					
+					check = false;
+					bet = false;
+				}
+			}
 		}
 	}
 	
 	public void textBox(Graphics2D window, String t) {
 		window.setFont(new Font("TimesRoman", Font.PLAIN, 50));
 		window.drawString(t, 200, 500);
+		window.setFont(new Font("TimesRoman", Font.PLAIN, 20));
+	}
+	
+	public void textBox(Graphics2D window, String t, int q, int q1) {
+		window.setFont(new Font("TimesRoman", Font.PLAIN, 50));
+		window.drawString(t, q, q1);
 		window.setFont(new Font("TimesRoman", Font.PLAIN, 20));
 	}
 	
@@ -205,75 +276,90 @@ public class game extends Canvas implements KeyListener
 		    }
 		
 		if (e.getKeyCode()  == KeyEvent.VK_H) {
-			if(Score >= 10) {
+			if(Score >= 1) {
 				H1 = true; 
 				repaint();
 			}
 		}
 		if (e.getKeyCode()  == KeyEvent.VK_J) {
-			if(Score >= 30) {
+			if(Score >= 3) {
 				H2 = true; 
 				repaint();
 			}
 		}
 		if (e.getKeyCode()  == KeyEvent.VK_K) {
-			if(Score >= 50) {
+			if(Score >= 5) {
 				H3 = true; 
 				repaint();
 			}
 		}
+		if(e.getKeyCode() == KeyEvent.VK_ENTER && Start == false) {
+			Start = true;
+			repaint();
+		}
 		Guess += p;
 		repaint();
 		if (e.getKeyCode()  == KeyEvent.VK_SPACE) {
-			if(Guess.equals("")) {
+			if(Guess.equals("") && PGuess.equals("")) {
 				G = true;
 				//System.out.println("Make a Guess");
 				repaint();
 			}
-			else {
+			
+			else{
+				if(Guess.equals("")) {
+					G = true;
+					repaint();
+				}
+				if(!check) {
+					PGuess = Guess;
+					Guess = "";
+				}
 				check = true;
+				if(!Guess.equals("") && !PGuess.equals("")) {
+					bet = true;
+					repaint();
+				}
 				repaint();
 			}
 		}
  
-		else {check = false;}
+		//else {check = false;}
     }
-	
 	
 	public void Score(Graphics2D window) {
 		window.setFont(new Font("TimesRoman", Font.PLAIN, 50));
 		window.drawString("Score: "+Score, 30, 50);
 	}
+	
 	public void hint( Graphics2D window, int f1, int f2) {
 		window.setFont(new Font("TimesRoman", Font.PLAIN, 20));
 		String p1 = "";
 		window.drawString( "HINT 1", 600, 150 );
 			
 			int i = f1+f2;
-			int f = i-3, p = i+3;
+			int f = i-(int)(Math.random()*5), p = i+(int)(Math.random()*5);
 			if(f<2) {
 				f = 2;
 			}
 			if(p>12) {
 				p = 12;
 			}
-			if((H1 == true && Score >= 10)|| T == true) {
+			if((H1 == true && Score >= 1)|| T == true) {
 				p1 = "It is between " + f +" and "+ p +".";
 				window.drawString( p1, 600, 175 );
 				
-				if(T== false) {Score-=10;}
+				if(T== false) {Score-=1;}
 				T = true;
 			}
-			else if(Score < 10 && H1 == true && T==false) {
-				window.drawString( "Not High Engouh Score", 600, 175 );
-			}
+			
 			else {
-				window.drawString( "This hint costs: 10 points", 600, 175 );
+				window.drawString( "This hint costs: 1 point", 600, 175 );
 				
 			}
 		window.drawString( "HINT 2", 600, 200 );
 		
-			if((H2 == true && Score >= 30) || U == true) {
+			if((H2 == true && Score >= 3) || U == true) {
 				if(U == false) {
 					G1 = (int)(Math.random() * 12) + 1;
 					G2 = (int)(Math.random() * 12) + 1;
@@ -284,74 +370,91 @@ public class game extends Canvas implements KeyListener
 						G2 = (int)(Math.random() * 12) + 1;
 					}
 					
+					int o = (int)(Math.random()*3)+1;
+					
+					if(o == 3) {
+						j.add(G2);
+						j.add(G1);
+						j.add(i);
+					}
+					
+					if(o==2) {
+						j.add(G1);
+						j.add(i);
+						j.add(G2);
+					}
+					if(o==1) {
+						j.add(i);
+						j.add(G2);
+						j.add(G1);
+					}
+					
 				}
 				
-				p1 = "It is " + G1 +" or "+ i +" or "+ G2 +".";
+				p1 = "It is " + j.get(0) +" or "+ j.get(1) +" or "+ j.get(2) +".";
 				window.drawString( p1, 600, 225 );
-				if(U==false) {Score-=30;}
+				if(U==false) {
+					Score-=3;
+					
+					
+				}
 				 U = true;
 				
 			}
-			else if(Score < 30 && H2 == true && U == false) {
-				window.drawString( "Not High Engouh Score", 600, 225 );
-			}
 			else {
-				window.drawString( "This hint costs: 30 points", 600, 225 );
+				window.drawString( "This hint costs: 3 points", 600, 225 );
 			}
 		window.drawString( "HINT 3", 600, 250 );
 		
-		if((H3 == true && Score >= 50)|| I == true ) {
+		if((H3 == true && Score >= 5)|| I == true ) {
 			p1 = "It is "+ i+".";
 			window.drawString( p1, 600, 275 );
-			if(I==false) {Score-=50;} 
+			if(I==false) {Score-=5;} 
 			I = true;
 			}
-		else if(Score < 50 && H3 == true && I == false) {
-			window.drawString( "Not High Engouh Score", 600, 275 );
-		}
 		else {
-			window.drawString( "This hint costs: 50 points", 600, 275 );
+			window.drawString( "This hint costs: 5 points", 600, 275 );
 			
 		}
 	}
 	
 	public void drawSq(Rectangle rect2, Rectangle rect, Graphics2D window) {
-		window.setColor( Color.WHITE );
+		window.setColor( Color.RED );
 		window.fill(rect2);
 		int r = (int)(Math.random() * 6) + 1;
 		dots(r, rect2.x, rect2.y , window);
 		
 		
-		window.setColor( Color.WHITE );
+		window.setColor( Color.RED );
 		window.fill( rect );
 		r = (int)(Math.random() * 6) + 1;
 		dots(r, rect.x, rect.y, window);
 	}
 	
-	
 	public void drawSq(Rectangle rect2, Rectangle rect, Graphics2D window, int f1, int f2) {
-		window.setColor( Color.WHITE );
+		window.setColor( Color.RED );
 		
-		window.setColor( Color.WHITE );
+		window.setColor( Color.RED );
 		window.fill(rect2);
 		dots(f1, rect2.x, rect2.y , window);
 		
 		
-		window.setColor( Color.WHITE );
+		window.setColor( Color.RED );
 		window.fill( rect );
 		dots(f2, rect.x, rect.y, window);
 	}
+	
 	public void drawDi(Rectangle rect2, Rectangle rect, Graphics2D window) {
 		
 		Polygon pol = rota(rect2, window);
-		window.setColor( Color.WHITE );
+		window.setColor( Color.RED );
 		window.fillPolygon( pol );
 		int r = (int)(Math.random() * 6) + 1;
 		Rdots(r, pol.xpoints[0], pol.ypoints[0] , window);
 		
 		
 		Polygon pol2 = rota(rect, window);
-		window.setColor( Color.WHITE );
+		window.setColor( Color.RED );
 		window.fillPolygon( pol2 );
 		r = (int)(Math.random() * 6) + 1;
 		Rdots(r, pol2.xpoints[0], pol2.ypoints[0] , window);
@@ -359,7 +462,7 @@ public class game extends Canvas implements KeyListener
 	
 	public void dots(int numb, int x, int y, Graphics window) {
 
-		window.setColor(Color.RED);
+		window.setColor(Color.WHITE);
 		if(numb == 1) {
 			window.fillOval(x+55,y+55,40,40);
 		}
@@ -402,7 +505,7 @@ public class game extends Canvas implements KeyListener
 	
 	public void Rdots(int numb, int x, int y, Graphics window) {
 
-		window.setColor(Color.RED);
+		window.setColor(Color.WHITE);
 		if(numb == 1) {
 			window.fillOval(x+80, y-20,40,40);
 		}
