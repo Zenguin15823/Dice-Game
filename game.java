@@ -13,15 +13,16 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Canvas;
 
-public class game extends Canvas implements KeyListener
+public class game extends JPanel implements KeyListener
 {
 	private boolean check, H1, H2, H3, G, T, U, I, bet, Start;
-	private int S1, S2, Score, P1, P2, G1, G2, Co;
+	private int S1, S2, Score, P1, P2, G1, G2, Co, g1, g2;
 	private String Guess, PGuess;
 	private ArrayList<Integer> j;
 	private BufferedImage img = null;
@@ -46,6 +47,8 @@ public class game extends Canvas implements KeyListener
 		S2 = (int)(Math.random() * 6) + 1;
 		G1 = 0;
 		G2 = 0;
+		g1 = 0;
+		g2 = 0;
 		P1 = 1;
 		P2 = 1;
 		Guess = "";
@@ -67,17 +70,19 @@ public class game extends Canvas implements KeyListener
 		
 	}
 
-	public void paint( Graphics wi )
+	public void paintComponent( Graphics wi )
 	{
 		
-		
+		super.paintComponent(wi);
 		Rectangle rect2 = new Rectangle(175, 175, 150, 150);
 		Rectangle rect = new Rectangle( 375, 175, 150, 150);
 		
 		Graphics2D window = (Graphics2D) wi;
 		window.setFont(new Font("TimesRoman", Font.PLAIN, 20));
 		
-
+		
+		
+		
 		if(!Start) {
 			setBackground(Color.black);
 			window.setFont(new Font("TimesRoman", Font.PLAIN, 100));
@@ -237,6 +242,8 @@ public class game extends Canvas implements KeyListener
 		window.setFont(new Font("TimesRoman", Font.PLAIN, 20));
 	}
 	
+	
+	
 	public void keyPressed(KeyEvent e) {
  
 		String p = "";
@@ -278,38 +285,38 @@ public class game extends Canvas implements KeyListener
 		if (e.getKeyCode()  == KeyEvent.VK_H) {
 			if(Score >= 1) {
 				H1 = true; 
-				repaint();
+				//repaint();
 			}
 		}
 		if (e.getKeyCode()  == KeyEvent.VK_J) {
 			if(Score >= 3) {
 				H2 = true; 
-				repaint();
+				//repaint();
 			}
 		}
 		if (e.getKeyCode()  == KeyEvent.VK_K) {
 			if(Score >= 5) {
 				H3 = true; 
-				repaint();
+				//repaint();
 			}
 		}
 		if(e.getKeyCode() == KeyEvent.VK_ENTER && Start == false) {
 			Start = true;
-			repaint();
+			//repaint();
 		}
 		Guess += p;
-		repaint();
+		//repaint();
 		if (e.getKeyCode()  == KeyEvent.VK_SPACE) {
 			if(Guess.equals("") && PGuess.equals("")) {
 				G = true;
 				//System.out.println("Make a Guess");
-				repaint();
+				//repaint();
 			}
 			
 			else{
 				if(Guess.equals("")) {
 					G = true;
-					repaint();
+					//repaint();
 				}
 				if(!check) {
 					PGuess = Guess;
@@ -318,9 +325,9 @@ public class game extends Canvas implements KeyListener
 				check = true;
 				if(!Guess.equals("") && !PGuess.equals("")) {
 					bet = true;
-					repaint();
+					//repaint();
 				}
-				repaint();
+				//repaint();
 			}
 		}
  
@@ -338,15 +345,19 @@ public class game extends Canvas implements KeyListener
 		window.drawString( "HINT 1", 600, 150 );
 			
 			int i = f1+f2;
-			int f = i-(int)(Math.random()*5), p = i+(int)(Math.random()*5);
-			if(f<2) {
-				f = 2;
-			}
-			if(p>12) {
-				p = 12;
-			}
+			
 			if((H1 == true && Score >= 1)|| T == true) {
-				p1 = "It is between " + f +" and "+ p +".";
+				if(T == false) {
+					g1 = i-(int)(Math.random()*5); 
+					g2 = i+(int)(Math.random()*5);
+					if(g1<2) {
+						g1 = 2;
+					}
+					if(g2>12) {
+						g2 = 12;
+					}
+				}
+				p1 = "It is between " + g1 +" and "+ g2 +".";
 				window.drawString( p1, 600, 175 );
 				
 				if(T== false) {Score-=1;}
@@ -557,13 +568,34 @@ public class game extends Canvas implements KeyListener
 		return pol;
 	}
 	
+	public void run()
+	{
+
+		
+		try
+		{
+			while( true )
+			{	
+			   Thread.sleep(50);
+			   repaint();
+			}
+		}
+		catch( Exception e )
+		{
+			
+		}
+
+	}
+	
 	public static void main(String[] args) {
         JFrame frame = new JFrame("My Drawing");
-        Canvas canvas = new game();
-        canvas.setSize(800, 600);
+        game canvas = new game();
+        frame.setSize(850, 650);
         frame.add(canvas);
-        frame.pack();
+        //frame.pack();
+        
         frame.setVisible(true);
+        canvas.run();
     }
 
 	@Override
