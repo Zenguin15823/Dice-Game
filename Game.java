@@ -221,7 +221,7 @@ public class Game extends JPanel implements KeyListener
 					}
 				}
 			}
-			
+
 			if (falls || (int)(Math.random()*100*falliply) == 0) {
 				if (!falls || f == null) {
 					f = new Falling(Score);
@@ -235,18 +235,21 @@ public class Game extends JPanel implements KeyListener
 					int[] hey = m.orders.poll();
 					Score += f.killThem(hey[0], hey[1]);
 				}
-				
-				if (!f.hasAny()) falls = false;
+
+				if (!f.hasAny()) {
+					falls = false;
+					f = null;
+				}
 			}
-			
+
 		}
 	}
-	
+
 	public void doMuns(Graphics2D window) {
 		window.setColor(Color.GREEN);
 		for (int x = f.moneys.size()-1; x >= 0; x--) {
 			window.drawImage( mmm, f.moneys.get(x).x, f.moneys.get(x).y, f.moneys.get(x).width, f.moneys.get(x).height, null );
-			
+
 			if (f.moneys.get(x).fall())
 				f.moneys.remove(x);
 		}
@@ -321,6 +324,10 @@ public class Game extends JPanel implements KeyListener
 				H3 = true; 
 				//repaint();
 			}
+		}
+		if (e.getKeyCode()  == KeyEvent.VK_Q) {
+			System.out.println("hey " + falls);
+			falls = true; 
 		}
 		if(e.getKeyCode() == KeyEvent.VK_ENTER && Start == false) {
 			Start = true;
